@@ -48,6 +48,8 @@ dependencies {
     implementation(libs.activity)
     implementation ("com.github.bumptech.glide:glide:4.16.0")
     implementation("com.google.android.gms:play-services-auth:20.7.0")
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
