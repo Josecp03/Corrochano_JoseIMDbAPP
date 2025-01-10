@@ -48,17 +48,16 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     public void onBindViewHolder(@NonNull MovieViewHolder holder, int position) {
         Movie movie = movieList.get(position);
 
-        // Cargar la imagen del poster usando Glide
         Glide.with(context).load(movie.getPosterPath()).into(holder.posterImageView);
 
-        // Acción al hacer click sobre la película
+        // Listener para cuando hago click sobre una película
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, MovieDetailsActivity.class);
             intent.putExtra("pelicula", movie);
             context.startActivity(intent);
         });
 
-        // Acción de "long click" para agregar o eliminar de favoritos
+        // Listener para cuando hago longClick sobre una película
         holder.itemView.setOnLongClickListener(v -> {
             if (!favoritos) {
                 agregarFavorito(movie, holder.getAdapterPosition());
@@ -67,6 +66,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             }
             return true;
         });
+
     }
 
     @Override
@@ -84,36 +84,36 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     }
 
     private void agregarFavorito(Movie movie, int position) {
-        // Verificar si descripcionPelicula es null, y asignar un valor por defecto si lo es
-        String descripcion = movie.getDescripcion() != null ? movie.getDescripcion() : "Descripción no disponible";
+
+        String descripcion;
+        if (movie.getDescripcion() != null) {
+            descripcion = movie.getDescripcion();
+        } else {
+            descripcion = "Descripción no disponible";
+        }
 
         SQLiteDatabase dbWrite = databaseHelper.getWritableDatabase();
 
         long result = databaseHelper.insertarFavorito(
                 dbWrite,
-                idUsuario,  // Usamos el ID del usuario autenticado
+                idUsuario,
                 movie.getId(),
                 movie.getTitle(),
-                descripcion,  // Usamos la descripción (ya verificada para no ser null)
+                descripcion,
                 movie.getReleaseDate(),
-                String.valueOf(movie.getRating()),  // Convertimos el ranking a String si es necesario
+                String.valueOf(movie.getRating()),
                 movie.getPosterPath()
         );
+
         dbWrite.close();
 
         if (result != -1) {
-            Toast.makeText(context, "Se ha agregado a favoritos: " + movie.getTitle(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Agregada a favoritos: " + movie.getTitle(), Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(context, "Error al agregar a favoritos.", Toast.LENGTH_SHORT).show();
         }
     }
-
-
-
-
-
-
-    // Método para eliminar una película de favoritos
+    
     private void eliminarFavorito(Movie movie, int position) {
         SQLiteDatabase dbWrite = databaseHelper.getWritableDatabase();
         int rowsDeleted = dbWrite.delete(
@@ -124,7 +124,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         dbWrite.close();
 
         if (rowsDeleted > 0) {
-            Toast.makeText(context, "Eliminado de favoritos: " + movie.getTitle(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, movie.getTitle() + " eliminado de favoritos: ", Toast.LENGTH_SHORT).show();
             movieList.remove(position);
             notifyItemRemoved(position);
         } else {

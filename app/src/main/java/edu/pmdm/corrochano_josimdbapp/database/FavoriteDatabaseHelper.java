@@ -9,7 +9,7 @@ import androidx.annotation.Nullable;
 
 public class FavoriteDatabaseHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 4;
     private static final String DATABASE_NOMBRE = "peliculas.db";
     public static final String TABLE_FAVORITOS = "t_favoritos";
 
@@ -25,7 +25,7 @@ public class FavoriteDatabaseHelper extends SQLiteOpenHelper {
                 "nombrePelicula TEXT NOT NULL ," +
                 "descripcionPelicula TEXT NOT NULL," +
                 "fechaLanzamiento TEXT NOT NULL," +
-                "rankingPelicula TEXT NOT NULL," + // Guardamos el ranking como texto
+                "rankingPelicula TEXT NOT NULL," +
                 "portadaURL TEXT NOT NULL," +
                 "PRIMARY KEY (idUsuario, idPelicula))");
     }
@@ -48,18 +48,14 @@ public class FavoriteDatabaseHelper extends SQLiteOpenHelper {
         ContentValues valores = new ContentValues();
 
         valores.put("idPelicula", idPelicula);
-        valores.put("idUsuario", idUsuario);  // Asegúrate de que este valor no sea null ni incorrecto
+        valores.put("idUsuario", idUsuario);
         valores.put("nombrePelicula", nombrePelicula);
         valores.put("descripcionPelicula", descripcionPelicula);
         valores.put("fechaLanzamiento", fechaLanzamiento);
-        valores.put("rankingPelicula", rankingPelicula);  // Asegúrate de que sea un String
+        valores.put("rankingPelicula", rankingPelicula);
         valores.put("portadaURL", portadaURL);
 
-        return db.insert(TABLE_FAVORITOS, null, valores);  // Este valor es el ID de la fila insertada, debería ser > 0 si la inserción fue exitosa
-    }
-
-    public int borrarTodosLosFavoritos(SQLiteDatabase db) {
-        return db.delete(TABLE_FAVORITOS, null, null);
+        return db.insert(TABLE_FAVORITOS, null, valores);
     }
 
 }

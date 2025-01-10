@@ -96,7 +96,7 @@ public class HomeFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     List<PopularMoviesResponse.Edge> edges = response.body().getData().getTopMeterTitles().getEdges();
                     if (edges != null && !edges.isEmpty()) {
-                        movieList.clear();  // Limpiar la lista antes de agregar los nuevos elementos
+                        movieList.clear();
                         for (int i = 0; i < Math.min(edges.size(), 10); i++) {
                             PopularMoviesResponse.Edge edge = edges.get(i);
                             PopularMoviesResponse.Node node = edge.getNode();
@@ -105,9 +105,9 @@ public class HomeFragment extends Fragment {
                             movie.setTitle(node.getTitleText().getText());
                             movie.setReleaseDate(node.getPrimaryImage().getUrl());
                             movie.setPosterPath(node.getPrimaryImage().getUrl());
-                            movieList.add(movie); // Agregar la película a la lista
+                            movieList.add(movie);
                         }
-                        adapter.notifyDataSetChanged(); // Notificar al adaptador que los datos han cambiado
+                        adapter.notifyDataSetChanged();
                     }
                 } else {
                     Toast.makeText(getContext(), "Error al cargar películas", Toast.LENGTH_SHORT).show();
