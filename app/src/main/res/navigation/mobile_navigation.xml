@@ -13,7 +13,7 @@
 
     <fragment
         android:id="@+id/nav_gallery"
-        android:name="edu.pmdm.corrochano_josimdbapp.ui.gallery.GalleryFragment"
+        android:name="edu.pmdm.corrochano_josimdbapp.ui.favorites.FavoritesFragment"
         android:label="@string/menu_gallery"
         tools:layout="@layout/fragment_gallery" />
 

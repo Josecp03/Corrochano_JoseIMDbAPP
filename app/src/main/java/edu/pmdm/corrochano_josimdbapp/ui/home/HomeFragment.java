@@ -5,13 +5,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 import edu.pmdm.corrochano_josimdbapp.adapters.MovieAdapter;
 import edu.pmdm.corrochano_josimdbapp.api.IMDBApiService;
 import edu.pmdm.corrochano_josimdbapp.databinding.FragmentHomeBinding;
+import edu.pmdm.corrochano_josimdbapp.database.FavoriteDatabaseHelper;
 import edu.pmdm.corrochano_josimdbapp.models.Movie;
 import edu.pmdm.corrochano_josimdbapp.models.PopularMoviesResponse;
 import okhttp3.OkHttpClient;
@@ -37,22 +40,33 @@ public class HomeFragment extends Fragment {
     private List<Movie> movieList = new ArrayList<>();
     private MovieAdapter adapter;
     private RecyclerView re;
+    private FavoriteDatabaseHelper databaseHelper;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        HomeViewModel homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        // Obtener el idUsuario desde Firebase Auth
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();  // Obtienes la instancia de FirebaseAuth
+        String idUsuario = mAuth.getCurrentUser() != null ? mAuth.getCurrentUser().getUid() : null;  // Obtener el ID del usuario autenticado
 
+        // Verificar si el usuario está autenticado
+        if (idUsuario == null) {
+            Log.e("HomeFragment", "No hay usuario autenticado.");
+            return null;  // Si no está autenticado, puedes salir del fragmento o mostrar un mensaje
+        }
+
+        // Inicialización de la base de datos y demás componentes
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+        databaseHelper = new FavoriteDatabaseHelper(getContext());
 
-        // Configurar el recyclerview
+        // Configurar RecyclerView
         re = binding.recycler;
-        re.setLayoutManager(new GridLayoutManager(getContext(), 2));
-        adapter = new MovieAdapter(getContext(), movieList);
+        re.setLayoutManager(new GridLayoutManager(getContext(), 2)); // 2 columnas
+        adapter = new MovieAdapter(getContext(), movieList, idUsuario, databaseHelper, false); // Pasa idUsuario al adaptador
         re.setAdapter(adapter);
 
-        // Configuración la API
+        // Configuración de la API
         OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(chain -> {
                     Request modifiedRequest = chain.request().newBuilder()
@@ -65,7 +79,7 @@ public class HomeFragment extends Fragment {
                 .readTimeout(30, TimeUnit.SECONDS)
                 .build();
 
-        // Inicialización de la librería Retrofit
+        // Inicialización de Retrofit
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://imdb-com.p.rapidapi.com/")
                 .client(client)
@@ -74,7 +88,7 @@ public class HomeFragment extends Fragment {
 
         imdbApiService = retrofit.create(IMDBApiService.class);
 
-        // Realizar la llamada a la API
+        // Llamada a la API
         Call<PopularMoviesResponse> call = imdbApiService.obtenerTop10("US");
         call.enqueue(new Callback<PopularMoviesResponse>() {
             @Override
@@ -95,13 +109,15 @@ public class HomeFragment extends Fragment {
                         }
                         adapter.notifyDataSetChanged();
                     }
+                } else {
+                    Toast.makeText(getContext(), "Error al cargar películas", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<PopularMoviesResponse> call, Throwable t) {
                 Log.e("HomeFragment", "Error en la llamada API: " + t.getMessage());
-}
+            }
         });
 
         return root;
