@@ -45,13 +45,13 @@ public class Top10Fragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         // Obtener el idUsuario desde Firebase Auth
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();  // Obtienes la instancia de FirebaseAuth
-        String idUsuario = mAuth.getCurrentUser() != null ? mAuth.getCurrentUser().getUid() : null;  // Obtener el ID del usuario autenticado
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        String idUsuario = mAuth.getCurrentUser() != null ? mAuth.getCurrentUser().getUid() : null;
 
         // Verificar si el usuario está autenticado
         if (idUsuario == null) {
             Log.e("HomeFragment", "No hay usuario autenticado.");
-            return null;  // Si no está autenticado, puedes salir del fragmento o mostrar un mensaje
+            return null;
         }
 
         // Inicialización de la base de datos y demás componentes
