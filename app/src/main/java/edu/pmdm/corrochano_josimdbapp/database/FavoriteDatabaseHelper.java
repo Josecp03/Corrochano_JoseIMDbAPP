@@ -9,7 +9,7 @@ import androidx.annotation.Nullable;
 
 public class FavoriteDatabaseHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5; // Actualizado a la versión 5
     private static final String DATABASE_NOMBRE = "peliculas.db";
     public static final String TABLE_FAVORITOS = "t_favoritos";
 
@@ -22,27 +22,24 @@ public class FavoriteDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE " + TABLE_FAVORITOS + "(" +
                 "idPelicula TEXT NOT NULL," +
                 "idUsuario TEXT NOT NULL," +
-                "nombrePelicula TEXT NOT NULL ," +
-                "descripcionPelicula TEXT NOT NULL," +
-                "fechaLanzamiento TEXT NOT NULL," +
-                "rankingPelicula TEXT NOT NULL," +
+                "nombrePelicula TEXT NOT NULL," +
                 "portadaURL TEXT NOT NULL," +
                 "PRIMARY KEY (idUsuario, idPelicula))");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE " + TABLE_FAVORITOS);
-        onCreate(db);
+        if (oldVersion < 5) {
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_FAVORITOS);
+            onCreate(db);
+        }
     }
 
+    // Método actualizado para insertar favoritos con las nuevas columnas
     public long insertarFavorito(SQLiteDatabase db,
                                  String idUsuario,
                                  String idPelicula,
                                  String nombrePelicula,
-                                 String descripcionPelicula,
-                                 String fechaLanzamiento,
-                                 String rankingPelicula,
                                  String portadaURL) {
 
         ContentValues valores = new ContentValues();
@@ -50,9 +47,6 @@ public class FavoriteDatabaseHelper extends SQLiteOpenHelper {
         valores.put("idPelicula", idPelicula);
         valores.put("idUsuario", idUsuario);
         valores.put("nombrePelicula", nombrePelicula);
-        valores.put("descripcionPelicula", descripcionPelicula);
-        valores.put("fechaLanzamiento", fechaLanzamiento);
-        valores.put("rankingPelicula", rankingPelicula);
         valores.put("portadaURL", portadaURL);
 
         return db.insert(TABLE_FAVORITOS, null, valores);

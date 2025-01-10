@@ -2,6 +2,9 @@ package edu.pmdm.corrochano_josimdbapp.ui.favorites;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -9,14 +12,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -48,9 +51,9 @@ public class FavoritesFragment extends Fragment {
     private List<Movie> pelisFavoritas = new ArrayList<>();
     private FavoriteDatabaseHelper database;
     private MovieAdapter adapter;
-    private static final int REQUEST_CODE_PERMISSIONS = 101;
 
-
+    private ActivityResultLauncher<String[]> requestPermissionsLauncher;
+    private ActivityResultLauncher<Intent> enableBluetoothLauncher;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -70,57 +73,111 @@ public class FavoritesFragment extends Fragment {
 
         cargarPeliculasFavoritas();
 
-
+        // Registrar lanzadores para permisos y activar Bluetooth
+        registerLaunchers();
 
         binding.buttonShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                requestPermissions();
+                requestPermissionsAndShare();
             }
         });
-
-
 
         return root;
     }
 
-    private void requestPermissions() {
+    private void registerLaunchers() {
+        // Lanzador para solicitar permisos
+        requestPermissionsLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestMultiplePermissions(),
+                result -> {
+                    boolean allGranted = true;
+                    for (Boolean granted : result.values()) {
+                        allGranted = allGranted && granted;
+                    }
+                    if (allGranted) {
+                        // Permisos otorgados, verificar Bluetooth
+                        checkAndEnableBluetooth();
+                    } else {
+                        Toast.makeText(getContext(), "Permisos denegados", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
 
-        String cadenaJSON = "";
+        // Lanzador para solicitar activar Bluetooth
+        enableBluetoothLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == getActivity().RESULT_OK) {
+                        // Bluetooth activado, mostrar diálogo
+                        showShareDialog();
+                    } else {
+                        Toast.makeText(getContext(), "Bluetooth no fue activado", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+    }
 
-        // Convertir el ArrayList a JSON
-        Gson gson = new Gson();
-        cadenaJSON = gson.toJson(pelisFavoritas);
-
+    private void requestPermissionsAndShare() {
+        // Verificar si ya se tienen los permisos
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(getContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
 
-            ActivityCompat.requestPermissions(
-                    getActivity(),
-                    new String[]{
-                            Manifest.permission.BLUETOOTH_SCAN,
-                            Manifest.permission.BLUETOOTH_CONNECT
-                    },
-                    REQUEST_CODE_PERMISSIONS
-            );
-
-            AlertDialog dialogoShare = crearDiaogoInstrucciones(cadenaJSON);
-            dialogoShare.show();
+            // Solicitar permisos
+            requestPermissionsLauncher.launch(new String[]{
+                    Manifest.permission.BLUETOOTH_SCAN,
+                    Manifest.permission.BLUETOOTH_CONNECT
+            });
 
         } else {
+            // Permisos ya otorgados, verificar Bluetooth
+            checkAndEnableBluetooth();
+        }
+    }
+
+    private void checkAndEnableBluetooth() {
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter != null) {
+            if (!bluetoothAdapter.isEnabled()) {
+                // Solicitar al usuario que active Bluetooth
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                enableBluetoothLauncher.launch(enableBtIntent);
+            } else {
+                // Bluetooth ya está activado, mostrar diálogo
+                showShareDialog();
+            }
+        } else {
+            Toast.makeText(getContext(), "Bluetooth no está soportado en este dispositivo.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void showShareDialog() {
+
+        if (pelisFavoritas.isEmpty()) {
+
+            Toast.makeText(getContext(), "Error al compartir. No hay películas en favoritos", Toast.LENGTH_SHORT).show();
+
+        } else {
+
+            // Convertir el ArrayList a JSON
+            Gson gson = new Gson();
+            String cadenaJSON = gson.toJson(pelisFavoritas);
+
             AlertDialog dialogoShare = crearDiaogoInstrucciones(cadenaJSON);
             dialogoShare.show();
+
         }
+
 
     }
 
-    private AlertDialog crearDiaogoInstrucciones(String listaPersonas) {
+    private AlertDialog crearDiaogoInstrucciones(String listaPeliculasJSON) {
 
         // Inicializar Variables
         AlertDialog dialogo = null;
 
         // Convertir el archivo XML del diseño del diálogo en un objeto View para poder utilizarlo
-        View alertCustomDialog = LayoutInflater.from(getContext()).inflate(R.layout.custom_dialog_compartir,null);
+        View alertCustomDialog = LayoutInflater.from(getContext()).inflate(R.layout.custom_dialog_compartir, null);
 
         // Constructor del diálogo
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
@@ -133,19 +190,22 @@ public class FavoritesFragment extends Fragment {
 
         // Asignar valores al diálogo
         TextView txtTitle = alertCustomDialog.findViewById(R.id.TextViewTitle);
-        TextView txtContenido = alertCustomDialog.findViewById(R.id.TextViewContent) ;
-        txtContenido.setText(listaPersonas);
+        TextView txtContenido = alertCustomDialog.findViewById(R.id.TextViewContent);
+        txtContenido.setText(listaPeliculasJSON);
         txtTitle.setText("Películas favoritas en JSON");
 
         // Crear el Diálogo
         dialogo = alertDialog.create();
 
         // Establecer fondo del diálogo transparente
-        dialogo.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        if (dialogo.getWindow() != null) {
+            dialogo.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
 
         // Añadir evento cuando se pulsa el icono de salir
+        ImageButton finalCancelButton = cancelButton;
         AlertDialog finalDialogo = dialogo;
-        cancelButton.setOnClickListener(new View.OnClickListener() {
+        finalCancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finalDialogo.cancel();
@@ -154,23 +214,7 @@ public class FavoritesFragment extends Fragment {
 
         // Devolver el dialogo creado
         return dialogo;
-
     }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == REQUEST_CODE_PERMISSIONS) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(getContext(), "Permisos otorgados", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getContext(), "Permisos denegados", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-
 
     private void cargarPeliculasFavoritas() {
         new Thread(() -> {
@@ -178,7 +222,7 @@ public class FavoritesFragment extends Fragment {
             SQLiteDatabase db = database.getReadableDatabase();
 
             Cursor cursor = db.rawQuery(
-                    "SELECT * FROM " + FavoriteDatabaseHelper.TABLE_FAVORITOS + " WHERE idUsuario=?",
+                    "SELECT idPelicula, nombrePelicula, portadaURL FROM " + FavoriteDatabaseHelper.TABLE_FAVORITOS + " WHERE idUsuario=?",
                     new String[]{idUsuario}
             );
 
@@ -188,18 +232,13 @@ public class FavoritesFragment extends Fragment {
                 do {
                     @SuppressLint("Range") String idPelicula = cursor.getString(cursor.getColumnIndex("idPelicula"));
                     @SuppressLint("Range") String titulo = cursor.getString(cursor.getColumnIndex("nombrePelicula"));
-                    @SuppressLint("Range") String descripcion = cursor.getString(cursor.getColumnIndex("descripcionPelicula"));
-                    @SuppressLint("Range") String fecha = cursor.getString(cursor.getColumnIndex("fechaLanzamiento"));
-                    @SuppressLint("Range") String ranking = cursor.getString(cursor.getColumnIndex("rankingPelicula"));
-                    @SuppressLint("Range") String caratula = cursor.getString(cursor.getColumnIndex("portadaURL"));
+                    @SuppressLint("Range") String portada = cursor.getString(cursor.getColumnIndex("portadaURL"));
 
                     Movie movie = new Movie();
                     movie.setId(idPelicula);
                     movie.setTitle(titulo);
-                    movie.setDescripcion(descripcion);
-                    movie.setReleaseDate(fecha);
-                    movie.setRating(ranking);
-                    movie.setPosterPath(caratula);
+                    movie.setPosterPath(portada);
+
                     pelisFavoritas.add(movie);
 
                 } while (cursor.moveToNext());

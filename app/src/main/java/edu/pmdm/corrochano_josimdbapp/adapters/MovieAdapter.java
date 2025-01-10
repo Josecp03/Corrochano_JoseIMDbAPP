@@ -85,13 +85,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     private void agregarFavorito(Movie movie, int position) {
 
-        String descripcion;
-        if (movie.getDescripcion() != null) {
-            descripcion = movie.getDescripcion();
-        } else {
-            descripcion = "Descripción no disponible";
-        }
-
         SQLiteDatabase dbWrite = databaseHelper.getWritableDatabase();
 
         long result = databaseHelper.insertarFavorito(
@@ -99,9 +92,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
                 idUsuario,
                 movie.getId(),
                 movie.getTitle(),
-                descripcion,
-                movie.getReleaseDate(),
-                String.valueOf(movie.getRating()),
                 movie.getPosterPath()
         );
 
@@ -113,7 +103,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             Toast.makeText(context, "Error al agregar a favoritos.", Toast.LENGTH_SHORT).show();
         }
     }
-    
+
     private void eliminarFavorito(Movie movie, int position) {
         SQLiteDatabase dbWrite = databaseHelper.getWritableDatabase();
         int rowsDeleted = dbWrite.delete(
@@ -124,7 +114,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         dbWrite.close();
 
         if (rowsDeleted > 0) {
-            Toast.makeText(context, movie.getTitle() + " eliminado de favoritos: ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, movie.getTitle() + " eliminado de favoritos", Toast.LENGTH_SHORT).show();
             movieList.remove(position);
             notifyItemRemoved(position);
         } else {
