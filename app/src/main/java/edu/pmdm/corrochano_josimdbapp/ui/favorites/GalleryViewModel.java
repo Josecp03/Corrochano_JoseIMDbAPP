@@ -1,4 +1,4 @@
-package edu.pmdm.corrochano_josimdbapp.ui.gallery;
+package edu.pmdm.corrochano_josimdbapp.ui.favorites;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
