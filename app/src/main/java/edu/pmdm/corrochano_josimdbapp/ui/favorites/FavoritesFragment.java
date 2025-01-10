@@ -30,7 +30,7 @@ import java.util.List;
 import edu.pmdm.corrochano_josimdbapp.R;
 import edu.pmdm.corrochano_josimdbapp.adapters.MovieAdapter;
 import edu.pmdm.corrochano_josimdbapp.database.FavoriteDatabaseHelper;
-import edu.pmdm.corrochano_josimdbapp.databinding.FragmentGalleryBinding;
+import edu.pmdm.corrochano_josimdbapp.databinding.FragmentFavoritesBinding;
 import edu.pmdm.corrochano_josimdbapp.models.Movie;
 
 import android.database.Cursor;
@@ -43,7 +43,7 @@ import com.google.gson.Gson;
 
 public class FavoritesFragment extends Fragment {
 
-    private FragmentGalleryBinding binding;
+    private FragmentFavoritesBinding binding;
     private Handler mainHandler;
 
     private boolean favoritos = true;
@@ -57,7 +57,7 @@ public class FavoritesFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        binding = FragmentGalleryBinding.inflate(inflater, container, false);
+        binding = FragmentFavoritesBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         idUsuario = FirebaseAuth.getInstance().getCurrentUser() != null ?
