@@ -1,4 +1,4 @@
-package edu.pmdm.corrochano_josimdbapp.ui.home;
+package edu.pmdm.corrochano_josimdbapp.ui.top10;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -9,7 +9,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 import edu.pmdm.corrochano_josimdbapp.adapters.MovieAdapter;
 import edu.pmdm.corrochano_josimdbapp.api.IMDBApiService;
-import edu.pmdm.corrochano_josimdbapp.databinding.FragmentHomeBinding;
+import edu.pmdm.corrochano_josimdbapp.databinding.FragmentTop10Binding;
 import edu.pmdm.corrochano_josimdbapp.database.FavoriteDatabaseHelper;
 import edu.pmdm.corrochano_josimdbapp.models.Movie;
 import edu.pmdm.corrochano_josimdbapp.models.PopularMoviesResponse;
@@ -33,9 +32,9 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class HomeFragment extends Fragment {
+public class Top10Fragment extends Fragment {
 
-    private FragmentHomeBinding binding;
+    private FragmentTop10Binding binding;
     private IMDBApiService imdbApiService;
     private List<Movie> movieList = new ArrayList<>();
     private MovieAdapter adapter;
@@ -56,7 +55,7 @@ public class HomeFragment extends Fragment {
         }
 
         // Inicialización de la base de datos y demás componentes
-        binding = FragmentHomeBinding.inflate(inflater, container, false);
+        binding = FragmentTop10Binding.inflate(inflater, container, false);
         View root = binding.getRoot();
         databaseHelper = new FavoriteDatabaseHelper(getContext());
 

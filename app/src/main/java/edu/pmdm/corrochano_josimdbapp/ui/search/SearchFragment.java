@@ -1,4 +1,4 @@
-package edu.pmdm.corrochano_josimdbapp.ui.slideshow;
+package edu.pmdm.corrochano_josimdbapp.ui.search;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,24 +13,24 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.pmdm.corrochano_josimdbapp.databinding.FragmentSlideshowBinding;
+import edu.pmdm.corrochano_josimdbapp.databinding.FragmentSearchBinding;
 import edu.pmdm.corrochano_josimdbapp.models.Movie;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class SlideshowFragment extends Fragment {
+public class SearchFragment extends Fragment {
 
-    private FragmentSlideshowBinding binding;
+    private FragmentSearchBinding binding;
     private List<Movie> genereList = new ArrayList<>();
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        SlideshowViewModel slideshowViewModel =
-                new ViewModelProvider(this).get(SlideshowViewModel.class);
+        SearchViewModel slideshowViewModel =
+                new ViewModelProvider(this).get(SearchViewModel.class);
 
-        binding = FragmentSlideshowBinding.inflate(inflater, container, false);
+        binding = FragmentSearchBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         OkHttpClient client = new OkHttpClient();
