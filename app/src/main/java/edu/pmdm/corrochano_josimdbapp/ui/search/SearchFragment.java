@@ -1,10 +1,12 @@
 package edu.pmdm.corrochano_josimdbapp.ui.search;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -15,6 +17,7 @@ import androidx.fragment.app.Fragment;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.pmdm.corrochano_josimdbapp.MovieListActivity;
 import edu.pmdm.corrochano_josimdbapp.api.TMDbApiService;
 import edu.pmdm.corrochano_josimdbapp.databinding.FragmentSearchBinding;
 import edu.pmdm.corrochano_josimdbapp.models.Genero;
@@ -58,10 +61,9 @@ public class SearchFragment extends Fragment {
 
         tmdbApiService = retrofit.create(TMDbApiService.class);
 
-        // Obtener los géneros y poblar el spinner
+
         getGenres();
 
-        // Listener para cuando se pulsa el botón de buscar
         binding.buttonSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -69,13 +71,34 @@ public class SearchFragment extends Fragment {
                 if (binding.editTextNumberDate.getText().toString().isEmpty()) {
                     Toast.makeText(getContext(), "El año no puede estar vacío", Toast.LENGTH_SHORT).show();
                 } else {
+                    String date = binding.editTextNumberDate.getText().toString();
 
+                    // Obtener la posición seleccionada en el Spinner
+                    int selectedPosition = spinnerGeneros.getSelectedItemPosition();
 
+                    // Verificar que la posición sea válida
+                    if (selectedPosition != AdapterView.INVALID_POSITION && selectedPosition < generosList.size()) {
+                        Genero selectedGenero = generosList.get(selectedPosition);
 
+                        // Crear el Intent para MovieListActivity
+                        Intent intent = new Intent(getActivity(), MovieListActivity.class);
+
+                        // Pasar los datos como extras
+                        intent.putExtra("year", date);
+                        intent.putExtra("genreId", selectedGenero.getId());
+                        intent.putExtra("genreName", selectedGenero.getNombre());
+
+                        // Iniciar la actividad
+                        startActivity(intent);
+
+                    } else {
+                        Toast.makeText(getContext(), "Seleccione un género válido", Toast.LENGTH_SHORT).show();
+                    }
                 }
 
             }
         });
+
 
 
         return root;
