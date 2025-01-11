@@ -1,9 +1,13 @@
 package edu.pmdm.corrochano_josimdbapp.api;
 
+import com.google.gson.JsonObject;
+
 import edu.pmdm.corrochano_josimdbapp.models.MovieSearchResponse;
 import edu.pmdm.corrochano_josimdbapp.models.GeneroResponse;
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface TMDbApiService {
@@ -19,4 +23,9 @@ public interface TMDbApiService {
             @Query("sort_by") String sort_by,
             @Query("page") int page
     );
+
+    @GET("movie/{movie_id}/external_ids")
+    Call<JsonObject> getExternalIds(@Path("movie_id") String movieId, @Header("Authorization") String authHeader);
+
+
 }

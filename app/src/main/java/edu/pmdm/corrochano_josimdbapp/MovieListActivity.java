@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -152,6 +153,9 @@ public class MovieListActivity extends AppCompatActivity {
                                 movie.setPosterPath("https://via.placeholder.com/500x750?text=No+Image");
                             }
 
+                            // Llamada para obtener el ID de IMDB
+                            obtenerImdbId(String.valueOf(tmdbMovie.getId()), movie);
+
                             // Agregar la película a la lista
                             movieList.add(movie);
                         }
@@ -178,4 +182,32 @@ public class MovieListActivity extends AppCompatActivity {
         super.onDestroy();
         // Aquí puedes limpiar recursos si es necesario
     }
+
+    private void obtenerImdbId(String tmdbId, Movie movie) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://api.themoviedb.org/3/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        TMDbApiService tmdbApiService = retrofit.create(TMDbApiService.class);
+
+        Call<JsonObject> call = tmdbApiService.getExternalIds(tmdbId, "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmMDE2ZGRjOGRhYWZmYzUyYmM1MmUxN2I1MTQ2ZTk3MSIsIm5iZiI6MTczNjUzOTU1MC43NjksInN1YiI6IjY3ODE3ZDllYzVkMmU5NmUyNjdiNGMwZiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.cP-LiqfqCtg1E7xRX6nPOT3cdttykNkk95N3dvGxkbA");
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    String imdbId = response.body().get("imdb_id").getAsString();
+                    movie.setId(imdbId); // Guarda el ID de IMDB en el objeto Movie
+                } else {
+                    Log.e("MovieListActivity", "No se pudo obtener el ID de IMDB");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Log.e("MovieListActivity", "Error en la llamada a TMDB: " + t.getMessage());
+            }
+        });
+    }
+
 }
