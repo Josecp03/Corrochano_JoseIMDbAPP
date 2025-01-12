@@ -158,7 +158,7 @@ public class MovieListActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<MovieSearchResponse> call, Throwable t) {
-                Toast.makeText(MovieListActivity.this, "Error en la llamada API: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(MovieListActivity.this, "Error en la llamada API: " + t.getMessage(), Toast.LENGTH_SHORT).show(); // Comentario de prieba
             }
         });
     }
