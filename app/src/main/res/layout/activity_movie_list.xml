@@ -8,7 +8,6 @@
     android:layout_height="match_parent"
     tools:context=".MovieListActivity">
 
-    <!-- RecyclerView para listar las Películas -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="0dp"

@@ -69,7 +69,7 @@ public class Top10Fragment extends Fragment {
         OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(chain -> {
                     Request modifiedRequest = chain.request().newBuilder()
-                            .addHeader("X-RapidAPI-Key", "440d48ca01mshb9178145c398148p1c905ajsn498799d4ab35")
+                            .addHeader("X-RapidAPI-Key", "1d6b8bf5bemsh13bad6e5b669b95p146504jsnaa743711d880")
                             .addHeader("X-RapidAPI-Host", "imdb-com.p.rapidapi.com")
                             .build();
                     return chain.proceed(modifiedRequest);

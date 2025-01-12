@@ -75,15 +75,24 @@ public class MovieDetailsActivity extends AppCompatActivity {
         txtTitle.setText(pelicula.getTitle());
 
         // Cargar la imagen de la portada usando Glide
-        Glide.with(this)
-                .load(pelicula.getPosterPath())
-                .into(imagen);
+        if (pelicula.getPosterPath().endsWith("No+Image") || pelicula.getPosterPath().isEmpty()) {
+            // Si no hay portada, cargar una imagen predeterminada
+            Glide.with(this)
+                    .load(R.mipmap.placeholderportada)
+                    .into(imagen);
+        } else {
+            // Si hay portada, cargarla normalmente
+            Glide.with(this)
+                    .load(pelicula.getPosterPath())
+                    .into(imagen);
+        }
+
 
         // Configuración de OkHttpClient con encabezados para la API
         OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(chain -> {
                     Request modifiedRequest = chain.request().newBuilder()
-                            .addHeader("X-RapidAPI-Key", "440d48ca01mshb9178145c398148p1c905ajsn498799d4ab35")
+                            .addHeader("X-RapidAPI-Key", "1d6b8bf5bemsh13bad6e5b669b95p146504jsnaa743711d880")
                             .addHeader("X-RapidAPI-Host", "imdb-com.p.rapidapi.com")
                             .build();
                     return chain.proceed(modifiedRequest);
@@ -147,6 +156,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
             }
 
         });
+
+
 
     }
 

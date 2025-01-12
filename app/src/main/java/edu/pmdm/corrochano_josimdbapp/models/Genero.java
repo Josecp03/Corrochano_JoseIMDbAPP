@@ -3,6 +3,7 @@ package edu.pmdm.corrochano_josimdbapp.models;
 import com.google.gson.annotations.SerializedName;
 
 public class Genero {
+
     @SerializedName("id")
     private int id;
 

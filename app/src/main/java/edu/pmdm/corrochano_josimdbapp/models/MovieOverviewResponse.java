@@ -1,13 +1,10 @@
 package edu.pmdm.corrochano_josimdbapp.models;
 
-import java.util.List;
-
 public class MovieOverviewResponse {
     private Data data;
     private boolean status;
     private String message;
 
-    // Getters and setters
     public Data getData() {
         return data;
     }
@@ -35,7 +32,6 @@ public class MovieOverviewResponse {
     public static class Data {
         private Title title;
 
-        // Getters and setters
         public Title getTitle() {
             return title;
         }
@@ -59,7 +55,6 @@ public class MovieOverviewResponse {
         private Certificate certificate;
         private Runtime runtime;
 
-        // Getters and setters
         public String getId() {
             return id;
         }
@@ -160,7 +155,6 @@ public class MovieOverviewResponse {
     public static class TitleText {
         private String text;
 
-        // Getters and setters
         public String getText() {
             return text;
         }
@@ -174,7 +168,6 @@ public class MovieOverviewResponse {
         private int year;
         private Integer endYear;
 
-        // Getters and setters
         public int getYear() {
             return year;
         }
@@ -197,7 +190,6 @@ public class MovieOverviewResponse {
         private int day;
         private int year;
 
-        // Getters and setters
         public int getMonth() {
             return month;
         }
@@ -226,7 +218,6 @@ public class MovieOverviewResponse {
     public static class TitleType {
         private String text;
 
-        // Getters and setters
         public String getText() {
             return text;
         }
@@ -239,7 +230,6 @@ public class MovieOverviewResponse {
     public static class PrimaryImage {
         private String url;
 
-        // Getters and setters
         public String getUrl() {
             return url;
         }
@@ -253,7 +243,6 @@ public class MovieOverviewResponse {
         private double aggregateRating;
         private int voteCount;
 
-        // Getters and setters
         public double getAggregateRating() {
             return aggregateRating;
         }
@@ -274,7 +263,6 @@ public class MovieOverviewResponse {
     public static class EngagementStatistics {
         private WatchlistStatistics watchlistStatistics;
 
-        // Getters and setters
         public WatchlistStatistics getWatchlistStatistics() {
             return watchlistStatistics;
         }
@@ -286,7 +274,6 @@ public class MovieOverviewResponse {
         public static class WatchlistStatistics {
             private DisplayableCount displayableCount;
 
-            // Getters and setters
             public DisplayableCount getDisplayableCount() {
                 return displayableCount;
             }
@@ -298,7 +285,6 @@ public class MovieOverviewResponse {
             public static class DisplayableCount {
                 private String text;
 
-                // Getters and setters
                 public String getText() {
                     return text;
                 }
@@ -313,7 +299,6 @@ public class MovieOverviewResponse {
     public static class Plot {
         private PlotText plotText;
 
-        // Getters and setters
         public PlotText getPlotText() {
             return plotText;
         }
@@ -325,7 +310,6 @@ public class MovieOverviewResponse {
         public static class PlotText {
             private String plainText;
 
-            // Getters and setters
             public String getPlainText() {
                 return plainText;
             }
@@ -339,7 +323,6 @@ public class MovieOverviewResponse {
     public static class Certificate {
         private String rating;
 
-        // Getters and setters
         public String getRating() {
             return rating;
         }
@@ -352,7 +335,6 @@ public class MovieOverviewResponse {
     public static class Runtime {
         private int seconds;
 
-        // Getters and setters
         public int getSeconds() {
             return seconds;
         }

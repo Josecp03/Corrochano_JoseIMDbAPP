@@ -69,7 +69,11 @@ public class SearchFragment extends Fragment {
             public void onClick(View v) {
 
                 if (binding.editTextNumberDate.getText().toString().isEmpty()) {
+
                     Toast.makeText(getContext(), "El año no puede estar vacío", Toast.LENGTH_SHORT).show();
+
+
+
                 } else {
                     String date = binding.editTextNumberDate.getText().toString();
 

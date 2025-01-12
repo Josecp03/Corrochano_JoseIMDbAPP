@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     tools:context=".ui.favorites.FavoritesFragment">
 
-    <!-- Texto superior -->
     <TextView
         android:id="@+id/text_gallery"
         android:layout_width="match_parent"
@@ -19,7 +18,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- RecyclerView para favoritos -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewFavoritos"
         android:layout_width="0dp"

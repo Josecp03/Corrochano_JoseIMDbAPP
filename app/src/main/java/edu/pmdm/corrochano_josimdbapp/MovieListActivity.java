@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
@@ -191,15 +192,21 @@ public class MovieListActivity extends AppCompatActivity {
 
         TMDbApiService tmdbApiService = retrofit.create(TMDbApiService.class);
 
-        Call<JsonObject> call = tmdbApiService.getExternalIds(tmdbId, "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmMDE2ZGRjOGRhYWZmYzUyYmM1MmUxN2I1MTQ2ZTk3MSIsIm5iZiI6MTczNjUzOTU1MC43NjksInN1YiI6IjY3ODE3ZDllYzVkMmU5NmUyNjdiNGMwZiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.cP-LiqfqCtg1E7xRX6nPOT3cdttykNkk95N3dvGxkbA");
+        Call<JsonObject> call = tmdbApiService.getExternalIds(tmdbId, "Bearer " + TMDB_API_KEY);
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    String imdbId = response.body().get("imdb_id").getAsString();
-                    movie.setId(imdbId); // Guarda el ID de IMDB en el objeto Movie
+                    JsonElement imdbIdElement = response.body().get("imdb_id");
+                    if (imdbIdElement != null && !imdbIdElement.isJsonNull()) {
+                        String imdbId = imdbIdElement.getAsString();
+                        movie.setId(imdbId); // Guarda el ID de IMDB en el objeto Movie
+                    } else {
+                        Log.e("MovieListActivity", "El campo 'imdb_id' es null o no existe");
+                        movie.setId("ID no disponible");
+                    }
                 } else {
-                    Log.e("MovieListActivity", "No se pudo obtener el ID de IMDB");
+                    Log.e("MovieListActivity", "No se pudo obtener el ID de IMDB: " + response.code());
                 }
             }
 
@@ -209,5 +216,6 @@ public class MovieListActivity extends AppCompatActivity {
             }
         });
     }
+
 
 }

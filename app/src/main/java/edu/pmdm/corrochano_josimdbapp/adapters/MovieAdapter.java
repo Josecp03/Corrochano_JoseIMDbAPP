@@ -48,7 +48,11 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     public void onBindViewHolder(@NonNull MovieViewHolder holder, int position) {
         Movie movie = movieList.get(position);
 
-        Glide.with(context).load(movie.getPosterPath()).into(holder.posterImageView);
+        // Usar Glide para cargar la imagen con una predeterminada en caso de error
+        Glide.with(context)
+                .load(movie.getPosterPath()) // Cargar la portada de la película
+                .error(R.mipmap.placeholderportada) // Imagen predeterminada en caso de error
+                .into(holder.posterImageView);
 
         // Listener para cuando hago click sobre una película
         holder.itemView.setOnClickListener(v -> {
@@ -66,8 +70,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             }
             return true;
         });
-
     }
+
 
     @Override
     public int getItemCount() {
