@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class MovieDetailsResponse {
 
+    // Atributos
     private String overview;
     private String release_date;
 
@@ -34,4 +35,5 @@ public class MovieDetailsResponse {
     public void setVote_average(double vote_average) {
         this.vote_average = vote_average;
     }
+
 }

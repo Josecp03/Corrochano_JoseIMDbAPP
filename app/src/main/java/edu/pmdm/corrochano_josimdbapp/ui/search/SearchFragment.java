@@ -30,6 +30,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class SearchFragment extends Fragment {
 
+    // Atributos de la clase
     private FragmentSearchBinding binding;
     private TMDbApiService tmdbApiService;
     private Spinner spinnerGeneros;
@@ -42,9 +43,10 @@ public class SearchFragment extends Fragment {
         binding = FragmentSearchBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        // Vincular el atributo Spinner con el del XML
         spinnerGeneros = binding.spinner;
 
-        // Configurar Retrofit con Interceptor para añadir headers
+        // Configurar Retrofit con Interceptor para añadir headers necesarios a las solicitudes
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.themoviedb.org/3/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -59,88 +61,115 @@ public class SearchFragment extends Fragment {
                         .build())
                 .build();
 
+        // Crear una instancia de la interfaz TMDbApiService para realizar las solicitudes a la API
         tmdbApiService = retrofit.create(TMDbApiService.class);
 
-
+        // Llamada al método para obtener los géneros y establecerlos en el Spinner
         getGenres();
 
+        // Listener para cuando se pulsa el botón de buscar
         binding.buttonSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                // Comprobar que el año esté vacío
                 if (binding.editTextNumberDate.getText().toString().isEmpty()) {
-
                     Toast.makeText(getContext(), "El año no puede estar vacío", Toast.LENGTH_SHORT).show();
-
-
-
                 } else {
-                    String date = binding.editTextNumberDate.getText().toString();
 
-                    // Obtener la posición seleccionada en el Spinner
-                    int selectedPosition = spinnerGeneros.getSelectedItemPosition();
-
-                    // Verificar que la posición sea válida
-                    if (selectedPosition != AdapterView.INVALID_POSITION && selectedPosition < generosList.size()) {
-                        Genero selectedGenero = generosList.get(selectedPosition);
-
-                        // Crear el Intent para MovieListActivity
-                        Intent intent = new Intent(getActivity(), MovieListActivity.class);
-
-                        // Pasar los datos como extras
-                        intent.putExtra("year", date);
-                        intent.putExtra("genreId", selectedGenero.getId());
-                        intent.putExtra("genreName", selectedGenero.getNombre());
-
-                        // Iniciar la actividad
-                        startActivity(intent);
-
+                    // Comprobar que el año sea mayor a 1900 (Límite personalizado)
+                    if (Integer.parseInt(binding.editTextNumberDate.getText().toString()) < 1900 ) {
+                        Toast.makeText(getContext(), "Error. Introduzca una fecha superior 1900", Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(getContext(), "Seleccione un género válido", Toast.LENGTH_SHORT).show();
+
+                        // Comprobar que el año sea menor al año actual + 1 (Límite personalizado)
+                        if (Integer.parseInt(binding.editTextNumberDate.getText().toString()) > java.util.Calendar.getInstance().get(java.util.Calendar.YEAR) + 1) {
+                            Toast.makeText(getContext(), "Error. Introduzca una fecha inferior a un año más que el actual", Toast.LENGTH_SHORT).show();
+                        } else {
+
+                            // Obtener la fecha
+                            String date = binding.editTextNumberDate.getText().toString();
+
+                            // Obtener la posición seleccionada en el Spinner
+                            int selectedPosition = spinnerGeneros.getSelectedItemPosition();
+
+                            // Obtener el género seleccionado
+                            Genero selectedGenero = generosList.get(selectedPosition);
+
+                            // Crear el Intent para MovieListActivity
+                            Intent intent = new Intent(getActivity(), MovieListActivity.class);
+
+                            // Pasar los datos como extras
+                            intent.putExtra("year", date);
+                            intent.putExtra("genreId", selectedGenero.getId());
+                            intent.putExtra("genreName", selectedGenero.getNombre());
+
+                            // Iniciar la actividad
+                            startActivity(intent);
+
+                        }
+
                     }
+
                 }
 
             }
+
         });
-
-
 
         return root;
     }
 
+    // Método para obtener los géneros de la API
     private void getGenres() {
+
+        // Realiza una llamada a la API para obtener los géneros, especificando el idioma
         Call<GeneroResponse> call = tmdbApiService.getGenres("en-US");
+
+        // Enqueue para realizar la llamada de forma asíncrona y manejar la respuesta
         call.enqueue(new Callback<GeneroResponse>() {
             @Override
             public void onResponse(Call<GeneroResponse> call, Response<GeneroResponse> response) {
+
+                // Verifica si la respuesta fue exitosa y contiene un cuerpo válido
                 if (response.isSuccessful() && response.body() != null) {
+
+                    // Obtiene la lista de géneros de la respuesta de la API
                     generosList = response.body().getGenres();
+
+                    // Crear una lista para almacenar los nombres de los géneros
                     List<String> generoNames = new ArrayList<>();
+
+                    // Recorre la lista de géneros y extrae los nombres para mostrarlos en el Spinner
                     for (Genero genero : generosList) {
                         generoNames.add(genero.getNombre());
                     }
 
-                    // Configurar el adaptador para el spinner
+                    // Configura un adaptador para el Spinner usando la lista de nombres de géneros
                     ArrayAdapter<String> adapter = new ArrayAdapter<>(
                             requireContext(),
                             android.R.layout.simple_spinner_item,
                             generoNames
                     );
 
+                    // Define el diseño para los elementos desplegables del Spinner
                     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+                    // Asigna el adaptador al Spinner para mostrar los datos
                     spinnerGeneros.setAdapter(adapter);
 
                 } else {
                     Toast.makeText(getContext(), "Error al obtener los géneros", Toast.LENGTH_SHORT).show();
-                    Log.e("SearchFragment", "Respuesta no exitosa: " + response.code());
                 }
+
             }
 
+            // Muestra un mensaje de error si ocurre un fallo en la conexión o en la llamada a la API
             @Override
             public void onFailure(Call<GeneroResponse> call, Throwable t) {
                 Toast.makeText(getContext(), "Error al conectar con la API", Toast.LENGTH_SHORT).show();
-                Log.e("SearchFragment", "Error en la llamada API: " + t.getMessage());
             }
+
         });
     }
 
@@ -149,4 +178,5 @@ public class SearchFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
 }

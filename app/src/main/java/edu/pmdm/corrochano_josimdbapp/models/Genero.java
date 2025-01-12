@@ -4,17 +4,20 @@ import com.google.gson.annotations.SerializedName;
 
 public class Genero {
 
+    // Atributos
     @SerializedName("id")
     private int id;
 
     @SerializedName("name")
     private String nombre;
 
+    // Constructor
     public Genero(int id, String nombre) {
         this.id = id;
         this.nombre = nombre;
     }
 
+    // Getters y Setters
     public int getId() {
         return id;
     }
@@ -30,4 +33,5 @@ public class Genero {
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
+
 }

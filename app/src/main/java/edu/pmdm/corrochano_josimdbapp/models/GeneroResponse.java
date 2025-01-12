@@ -5,9 +5,11 @@ import java.util.List;
 
 public class GeneroResponse {
 
+    // Atributos
     @SerializedName("genres")
     private List<Genero> genres;
 
+    // Getters y Setters
     public List<Genero> getGenres() {
         return genres;
     }
@@ -15,4 +17,5 @@ public class GeneroResponse {
     public void setGenres(List<Genero> genres) {
         this.genres = genres;
     }
+
 }

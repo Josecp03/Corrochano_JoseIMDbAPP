@@ -21,4 +21,8 @@
     <string name="cargando_descripci_n">Cargando Descripción...\n</string>
     <string name="cargando_fecha">Cargando Fecha...</string>
     <string name="cargando_rating">Cargando Rating...</string>
+    <string name="compartir">Compartir</string>
+    <string name="buscar">Buscar</string>
+    <string name="ingrese_el_a_o">Ingrese el año</string>
+    <string name="log_out">Log Out</string>
 </resources>

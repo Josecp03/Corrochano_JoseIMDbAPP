@@ -4,6 +4,7 @@ import java.util.List;
 
 public class TMDBMovie {
 
+    // Atributos
     private boolean adult;
     private String backdrop_path;
     private List<Integer> genre_ids;
@@ -19,8 +20,7 @@ public class TMDBMovie {
     private double vote_average;
     private int vote_count;
 
-    // Getters y Setters
-
+    //  Getters y Setters
     public boolean isAdult() {
         return adult;
     }
@@ -132,4 +132,5 @@ public class TMDBMovie {
     public void setVote_count(int vote_count) {
         this.vote_count = vote_count;
     }
+
 }

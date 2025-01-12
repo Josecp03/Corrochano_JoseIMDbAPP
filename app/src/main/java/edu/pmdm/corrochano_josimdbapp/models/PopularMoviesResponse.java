@@ -4,10 +4,12 @@ import java.util.List;
 
 public class PopularMoviesResponse {
 
+    // Atributos
     private Data data;
     private boolean status;
     private String message;
 
+    // Getters y Setters
     public Data getData() {
         return data;
     }
@@ -32,10 +34,13 @@ public class PopularMoviesResponse {
         this.message = message;
     }
 
+    // Clase Anidada Data
     public static class Data {
 
+        // Atributos
         private TopMeterTitles topMeterTitles;
 
+        // Getters y Setters
         public TopMeterTitles getTopMeterTitles() {
             return topMeterTitles;
         }
@@ -44,9 +49,13 @@ public class PopularMoviesResponse {
             this.topMeterTitles = topMeterTitles;
         }
 
+        // Clase Anidada TopMeterTitles
         public static class TopMeterTitles {
+
+            // Atributos
             private List<Edge> edges;
 
+            // Getters y Setters
             public List<Edge> getEdges() {
                 return edges;
             }
@@ -54,13 +63,17 @@ public class PopularMoviesResponse {
             public void setEdges(List<Edge> edges) {
                 this.edges = edges;
             }
+
         }
     }
 
+    // Clase Anidada Edge
     public static class Edge {
 
+        // Atributos
         private Node node;
 
+        // Getters y Setters
         public Node getNode() {
             return node;
         }
@@ -71,12 +84,15 @@ public class PopularMoviesResponse {
 
     }
 
+    // Clase Anidada Node
     public static class Node {
 
+        // Atributos
         private String id;
         private TitleText titleText;
         private PrimaryImage primaryImage;
 
+        // Getters y Setters
         public String getId() {
             return id;
         }
@@ -100,12 +116,16 @@ public class PopularMoviesResponse {
         public void setPrimaryImage(PrimaryImage primaryImage) {
             this.primaryImage = primaryImage;
         }
+
     }
 
+    // Clase Anidada TitleText
     public static class TitleText {
 
+        // Atributo
         private String text;
 
+        // Getters y Setters
         public String getText() {
             return text;
         }
@@ -116,10 +136,13 @@ public class PopularMoviesResponse {
 
     }
 
+    // Clase Anidada PrimaryImage
     public static class PrimaryImage {
 
+        // Atributo
         private String url;
 
+        // Getters y Setters
         public String getUrl() {
             return url;
         }

@@ -42,14 +42,13 @@ public class MovieListActivity extends AppCompatActivity {
     private FavoriteDatabaseHelper databaseHelper;
 
     // Clave API de TMDb
-    private static final String TMDB_API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmMDE2ZGRjOGRhYWZmYzUyYmM1MmUxN2I1MTQ2ZTk3MSIsIm5iZiI6MTczNjUzOTU1MC43NjksInN1YiI6IjY3ODE3ZDllYzVkMmU5NmUyNjdiNGMwZiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.cP-LiqfqCtg1E7xRX6nPOT3cdttykNkk95N3dvGxkbA"; // Reemplaza con tu nueva clave API
+    private static final String TMDB_API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmMDE2ZGRjOGRhYWZmYzUyYmM1MmUxN2I1MTQ2ZTk3MSIsIm5iZiI6MTczNjUzOTU1MC43NjksInN1YiI6IjY3ODE3ZDllYzVkMmU5NmUyNjdiNGMwZiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.cP-LiqfqCtg1E7xRX6nPOT3cdttykNkk95N3dvGxkbA"; // Reemplaza con tu clave API segura
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_movie_list);
-
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -138,13 +137,44 @@ public class MovieListActivity extends AppCompatActivity {
                         for (TMDBMovie tmdbMovie : results) {
                             Movie movie = new Movie();
                             movie.setId(String.valueOf(tmdbMovie.getId()));
-                            movie.setTitle(tmdbMovie.getTitle());
-                            movie.setOriginalTitle(tmdbMovie.getOriginal_title());
-                            movie.setReleaseDate(tmdbMovie.getRelease_date());
-                            movie.setDescripcion(tmdbMovie.getOverview());
-                            movie.setRating(String.valueOf(tmdbMovie.getVote_average()));
 
-                            // Construir la URL completa de la imagen
+                            // Título con valor predeterminado
+                            String title = tmdbMovie.getTitle();
+                            if (title == null || title.isEmpty()) {
+                                title = "Título no disponible";
+                            }
+                            movie.setTitle(title);
+
+                            // Título original con valor predeterminado
+                            String originalTitle = tmdbMovie.getOriginal_title();
+                            if (originalTitle == null || originalTitle.isEmpty()) {
+                                originalTitle = "Título original no disponible";
+                            }
+                            movie.setOriginalTitle(originalTitle);
+
+                            // Fecha de lanzamiento con valor predeterminado
+                            String releaseDate = tmdbMovie.getRelease_date();
+                            if (releaseDate == null || releaseDate.isEmpty()) {
+                                releaseDate = "Fecha no disponible";
+                            }
+                            movie.setReleaseDate(releaseDate);
+
+                            // Descripción con valor predeterminado
+                            String overview = tmdbMovie.getOverview();
+                            if (overview == null || overview.isEmpty()) {
+                                overview = "Descripción no disponible";
+                            }
+                            movie.setDescripcion(overview);
+
+                            // Rating con valor predeterminado
+                            Double voteAverage = tmdbMovie.getVote_average();
+                            if (voteAverage == null) {
+                                movie.setRating("No disponible");
+                            } else {
+                                movie.setRating(String.valueOf(voteAverage));
+                            }
+
+                            // URL de la imagen de la portada
                             String posterPath = tmdbMovie.getPoster_path();
                             if (posterPath != null && !posterPath.isEmpty()) {
                                 String posterUrl = "https://image.tmdb.org/t/p/w500" + posterPath;
@@ -185,6 +215,7 @@ public class MovieListActivity extends AppCompatActivity {
     }
 
     private void obtenerImdbId(String tmdbId, Movie movie) {
+        // Configurar Retrofit sin headers adicionales, ya que getExternalIds likely uses different endpoints
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.themoviedb.org/3/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -207,15 +238,16 @@ public class MovieListActivity extends AppCompatActivity {
                     }
                 } else {
                     Log.e("MovieListActivity", "No se pudo obtener el ID de IMDB: " + response.code());
+                    movie.setId("ID no disponible");
                 }
+
             }
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
-                Log.e("MovieListActivity", "Error en la llamada a TMDB: " + t.getMessage());
+                movie.setId("ID no disponible");
             }
         });
     }
-
 
 }

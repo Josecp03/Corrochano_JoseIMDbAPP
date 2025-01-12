@@ -4,12 +4,13 @@ import java.util.List;
 
 public class MovieSearchResponse {
 
+    // Atributos
     private int page;
     private List<TMDBMovie> results;
     private int total_pages;
     private int total_results;
 
-
+    // Getters y Setters
     public int getPage() {
         return page;
     }
@@ -41,4 +42,5 @@ public class MovieSearchResponse {
     public void setTotal_results(int total_results) {
         this.total_results = total_results;
     }
+
 }
