@@ -72,32 +72,42 @@ public class SearchFragment extends Fragment {
 
                     Toast.makeText(getContext(), "El año no puede estar vacío", Toast.LENGTH_SHORT).show();
 
-
-
                 } else {
-                    String date = binding.editTextNumberDate.getText().toString();
 
-                    // Obtener la posición seleccionada en el Spinner
-                    int selectedPosition = spinnerGeneros.getSelectedItemPosition();
+                    if (Integer.parseInt(binding.editTextNumberDate.getText().toString()) < 1900 ) {
 
-                    // Verificar que la posición sea válida
-                    if (selectedPosition != AdapterView.INVALID_POSITION && selectedPosition < generosList.size()) {
-                        Genero selectedGenero = generosList.get(selectedPosition);
-
-                        // Crear el Intent para MovieListActivity
-                        Intent intent = new Intent(getActivity(), MovieListActivity.class);
-
-                        // Pasar los datos como extras
-                        intent.putExtra("year", date);
-                        intent.putExtra("genreId", selectedGenero.getId());
-                        intent.putExtra("genreName", selectedGenero.getNombre());
-
-                        // Iniciar la actividad
-                        startActivity(intent);
+                        Toast.makeText(getContext(), "Error. Introduzca una fecha superior 1900", Toast.LENGTH_SHORT).show();
 
                     } else {
-                        Toast.makeText(getContext(), "Seleccione un género válido", Toast.LENGTH_SHORT).show();
+
+                        String date = binding.editTextNumberDate.getText().toString();
+
+                        // Obtener la posición seleccionada en el Spinner
+                        int selectedPosition = spinnerGeneros.getSelectedItemPosition();
+
+                        // Verificar que la posición sea válida
+                        if (selectedPosition != AdapterView.INVALID_POSITION && selectedPosition < generosList.size()) {
+                            Genero selectedGenero = generosList.get(selectedPosition);
+
+                            // Crear el Intent para MovieListActivity
+                            Intent intent = new Intent(getActivity(), MovieListActivity.class);
+
+                            // Pasar los datos como extras
+                            intent.putExtra("year", date);
+                            intent.putExtra("genreId", selectedGenero.getId());
+                            intent.putExtra("genreName", selectedGenero.getNombre());
+
+                            // Iniciar la actividad
+                            startActivity(intent);
+
+                        } else {
+                            Toast.makeText(getContext(), "Seleccione un género válido", Toast.LENGTH_SHORT).show();
+                        }
+
                     }
+
+
+
                 }
 
             }

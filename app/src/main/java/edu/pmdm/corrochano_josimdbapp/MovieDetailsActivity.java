@@ -37,7 +37,6 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-
 public class MovieDetailsActivity extends AppCompatActivity {
 
     private Movie pelicula;
@@ -72,21 +71,26 @@ public class MovieDetailsActivity extends AppCompatActivity {
         btnSMS = findViewById(R.id.btnSendSms);
         imagen = findViewById(R.id.ImageViewPortada);
 
-        txtTitle.setText(pelicula.getTitle());
+        // Título con valor predeterminado
+        String title = (pelicula != null && pelicula.getTitle() != null && !pelicula.getTitle().isEmpty())
+                ? pelicula.getTitle()
+                : "Título no disponible";
+        txtTitle.setText(title);
 
-        // Cargar la imagen de la portada usando Glide
-        if (pelicula.getPosterPath().endsWith("No+Image") || pelicula.getPosterPath().isEmpty()) {
+        // Cargar la imagen de la portada usando Glide con manejo de valores nulos
+        String posterPath = (pelicula != null) ? pelicula.getPosterPath() : "";
+        if (posterPath != null && !posterPath.endsWith("No+Image") && !posterPath.isEmpty()) {
+            Glide.with(this)
+                    .load(pelicula.getPosterPath())
+                    .placeholder(R.mipmap.placeholderportada) // Imagen de placeholder
+                    .error(R.mipmap.placeholderportada) // Imagen en caso de error
+                    .into(imagen);
+        } else {
             // Si no hay portada, cargar una imagen predeterminada
             Glide.with(this)
                     .load(R.mipmap.placeholderportada)
                     .into(imagen);
-        } else {
-            // Si hay portada, cargarla normalmente
-            Glide.with(this)
-                    .load(pelicula.getPosterPath())
-                    .into(imagen);
         }
-
 
         // Configuración de OkHttpClient con encabezados para la API
         OkHttpClient client = new OkHttpClient.Builder()
@@ -110,37 +114,88 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
         imdbApiService = retrofit.create(IMDBApiService.class);
 
-        Call<MovieOverviewResponse> call = imdbApiService.obtenerDatos(pelicula.getId());
-        call.enqueue(new Callback<MovieOverviewResponse>() {
-            @Override
-            public void onResponse(Call<MovieOverviewResponse> call, Response<MovieOverviewResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    String descripcion = response.body().getData().getTitle().getPlot().getPlotText().getPlainText();
-                    txtDescription.setText(descripcion);
+        if (pelicula != null && pelicula.getId() != null && !pelicula.getId().isEmpty() && !pelicula.getId().equals("ID no disponible")) {
+            Call<MovieOverviewResponse> call = imdbApiService.obtenerDatos(pelicula.getId());
+            call.enqueue(new Callback<MovieOverviewResponse>() {
+                @Override
+                public void onResponse(Call<MovieOverviewResponse> call, Response<MovieOverviewResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        MovieOverviewResponse.Data data = response.body().getData();
+                        if (data != null) {
+                            MovieOverviewResponse.Title titleData = data.getTitle();
+                            if (titleData != null) {
+                                // Descripción con valor predeterminado
+                                String descripcion = "Descripción no disponible";
+                                if (titleData.getPlot() != null &&
+                                        titleData.getPlot().getPlotText() != null &&
+                                        titleData.getPlot().getPlotText().getPlainText() != null &&
+                                        !titleData.getPlot().getPlotText().getPlainText().isEmpty()) {
+                                    descripcion = titleData.getPlot().getPlotText().getPlainText();
+                                }
+                                txtDescription.setText(descripcion);
 
-                    // Obtener y formatear la fecha de lanzamiento
-                    MovieOverviewResponse.ReleaseDate releaseDate = response.body().getData().getTitle().getReleaseDate();
-                    if (releaseDate != null) {
-                        String formattedDate = String.format("%d-%02d-%02d", releaseDate.getYear(), releaseDate.getMonth(), releaseDate.getDay());
-                        txtDate.setText("Release Date: " + formattedDate);
-                    }
+                                // Fecha de lanzamiento con valor predeterminado
+                                String formattedDate = "Fecha no disponible";
+                                MovieOverviewResponse.ReleaseDate releaseDate = titleData.getReleaseDate();
+                                if (releaseDate != null) {
+                                    formattedDate = String.format("%d-%02d-%02d", releaseDate.getYear(), releaseDate.getMonth(), releaseDate.getDay());
+                                }
+                                txtDate.setText("Release Date: " + formattedDate);
 
-                    // Obtener y mostrar el rating
-                    MovieOverviewResponse.RatingsSummary ratingsSummary = response.body().getData().getTitle().getRatingsSummary();
-                    if (ratingsSummary != null) {
-                        rating = ratingsSummary.getAggregateRating();
+                                // Rating con valor predeterminado
+                                String ratingText = "Rating: No disponible";
+                                MovieOverviewResponse.RatingsSummary ratingsSummary = titleData.getRatingsSummary();
+                                if (ratingsSummary != null) {
+                                    rating = ratingsSummary.getAggregateRating();
+                                    ratingText = "Rating: " + String.format("%.1f", rating);
+                                }
+                                TextView ratingView = findViewById(R.id.TextViewRating);
+                                ratingView.setText(ratingText);
+                            } else {
+                                // Asignar valores predeterminados si titleData es null
+                                txtDescription.setText("Descripción no disponible");
+                                txtDate.setText("Release Date: No disponible");
+                                TextView ratingView = findViewById(R.id.TextViewRating);
+                                ratingView.setText("Rating: No disponible");
+                                Toast.makeText(MovieDetailsActivity.this, "Información de la película no disponible.", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            // Asignar valores predeterminados si data es null
+                            txtDescription.setText("Descripción no disponible");
+                            txtDate.setText("Release Date: No disponible");
+                            TextView ratingView = findViewById(R.id.TextViewRating);
+                            ratingView.setText("Rating: No disponible");
+                            Toast.makeText(MovieDetailsActivity.this, "Información de la película no disponible.", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        // Asignar valores predeterminados en caso de fallo en la respuesta
+                        txtDescription.setText("Descripción no disponible");
+                        txtDate.setText("Release Date: No disponible");
                         TextView ratingView = findViewById(R.id.TextViewRating);
-                        ratingView.setText("Rating: " + String.format("%.1f", rating));
+                        ratingView.setText("Rating: No disponible");
+                        Toast.makeText(MovieDetailsActivity.this, "Error al obtener detalles de la película.", Toast.LENGTH_SHORT).show();
+                        Log.e("MovieDetailsActivity", "Respuesta no exitosa: " + response.code());
                     }
-
                 }
-            }
 
-            @Override
-            public void onFailure(Call<MovieOverviewResponse> call, Throwable t) {
-                Log.e("HomeFragment", "Error en la llamada API: " + t.getMessage());
-            }
-        });
+                @Override
+                public void onFailure(Call<MovieOverviewResponse> call, Throwable t) {
+                    Log.e("MovieDetailsActivity", "Error en la llamada API: " + t.getMessage());
+                    // Asignar valores predeterminados en caso de fallo
+                    txtDescription.setText("Descripción no disponible");
+                    txtDate.setText("Release Date: No disponible");
+                    TextView ratingView = findViewById(R.id.TextViewRating);
+                    ratingView.setText("Rating: No disponible");
+                    Toast.makeText(MovieDetailsActivity.this, "Error al obtener detalles de la película.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            // Asignar valores predeterminados si la película es nula o no tiene ID válido
+            txtDescription.setText("Descripción no disponible");
+            txtDate.setText("Release Date: No disponible");
+            TextView ratingView = findViewById(R.id.TextViewRating);
+            ratingView.setText("Rating: No disponible");
+        }
 
         btnSMS.setOnClickListener(v -> {
 
@@ -156,8 +211,6 @@ public class MovieDetailsActivity extends AppCompatActivity {
             }
 
         });
-
-
 
     }
 
