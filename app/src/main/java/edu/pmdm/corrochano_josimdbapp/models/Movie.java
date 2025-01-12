@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 public class Movie implements Parcelable {
 
+    // Atributos
     private String id;
     private String title;
     private String originalTitle;
@@ -13,7 +14,7 @@ public class Movie implements Parcelable {
     private String descripcion;
     private String rating;
 
-
+    // Constructores
     public Movie() {
     }
 
@@ -47,6 +48,7 @@ public class Movie implements Parcelable {
         }
     };
 
+    // Getters y Setters
     public String getId() {
         return id;
     }
@@ -103,6 +105,7 @@ public class Movie implements Parcelable {
         this.rating = rating;
     }
 
+    // Métodos
     @Override
     public int describeContents() {
         return 0;
@@ -119,10 +122,13 @@ public class Movie implements Parcelable {
         dest.writeString(rating);
     }
 
+    // Clase Anidada TitleText
     public static class TitleText implements Parcelable {
 
+        // Atributos
         private String text;
 
+        // Constructores
         public TitleText() {}
 
         protected TitleText(Parcel in) {
@@ -141,6 +147,7 @@ public class Movie implements Parcelable {
             }
         };
 
+        // Getters y Setters
         public String getText() {
             return text;
         }
@@ -149,6 +156,7 @@ public class Movie implements Parcelable {
             this.text = text;
         }
 
+        // Métodos
         @Override
         public int describeContents() {
             return 0;
@@ -158,12 +166,16 @@ public class Movie implements Parcelable {
         public void writeToParcel(Parcel dest, int flags) {
             dest.writeString(text);
         }
+
     }
 
+    // Clase Anidada PrimaryImage
     public static class PrimaryImage implements Parcelable {
 
+        // Atributos
         private String url;
 
+        // Constructores
         public PrimaryImage() {}
 
         protected PrimaryImage(Parcel in) {
@@ -182,6 +194,7 @@ public class Movie implements Parcelable {
             }
         };
 
+        // Getters y Setters
         public String getUrl() {
             return url;
         }
@@ -190,6 +203,7 @@ public class Movie implements Parcelable {
             this.url = url;
         }
 
+        // Métodos
         @Override
         public int describeContents() {
             return 0;
@@ -199,11 +213,16 @@ public class Movie implements Parcelable {
         public void writeToParcel(Parcel dest, int flags) {
             dest.writeString(url);
         }
+
     }
 
+    // Clase Anidada MeterRanking
     public static class MeterRanking implements Parcelable {
+
+        // Atributos
         private int currentRank;
 
+        // Constructores
         public MeterRanking() {}
 
         protected MeterRanking(Parcel in) {
@@ -222,6 +241,7 @@ public class Movie implements Parcelable {
             }
         };
 
+        // Getters y Setters
         public int getCurrentRank() {
             return currentRank;
         }
@@ -230,6 +250,7 @@ public class Movie implements Parcelable {
             this.currentRank = currentRank;
         }
 
+        // Métodos
         @Override
         public int describeContents() {
             return 0;
@@ -239,5 +260,7 @@ public class Movie implements Parcelable {
         public void writeToParcel(Parcel dest, int flags) {
             dest.writeInt(currentRank);
         }
+
     }
+
 }

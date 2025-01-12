@@ -1,13 +1,13 @@
 package edu.pmdm.corrochano_josimdbapp.models;
 
-import java.util.List;
-
 public class MovieOverviewResponse {
+
+    // Atributos
     private Data data;
     private boolean status;
     private String message;
 
-    // Getters and setters
+    // Getters y Setters
     public Data getData() {
         return data;
     }
@@ -32,10 +32,13 @@ public class MovieOverviewResponse {
         this.message = message;
     }
 
+    // Clase Anidada Data
     public static class Data {
+
+        // Atributos
         private Title title;
 
-        // Getters and setters
+        // Getters y Setters
         public Title getTitle() {
             return title;
         }
@@ -43,9 +46,13 @@ public class MovieOverviewResponse {
         public void setTitle(Title title) {
             this.title = title;
         }
+
     }
 
+    // Clase Anidada Title
     public static class Title {
+
+        // Atributos
         private String id;
         private TitleText titleText;
         private TitleText originalTitleText;
@@ -59,7 +66,7 @@ public class MovieOverviewResponse {
         private Certificate certificate;
         private Runtime runtime;
 
-        // Getters and setters
+        // Getters y Setters
         public String getId() {
             return id;
         }
@@ -155,12 +162,16 @@ public class MovieOverviewResponse {
         public void setRuntime(Runtime runtime) {
             this.runtime = runtime;
         }
+
     }
 
+    // Clase Anidada TitleText
     public static class TitleText {
+
+        // Atributos
         private String text;
 
-        // Getters and setters
+        // Getters y Setters
         public String getText() {
             return text;
         }
@@ -168,13 +179,17 @@ public class MovieOverviewResponse {
         public void setText(String text) {
             this.text = text;
         }
+
     }
 
+    // Clase Anidada ReleaseYear
     public static class ReleaseYear {
+
+        // Atributos
         private int year;
         private Integer endYear;
 
-        // Getters and setters
+        // Getters y Setters
         public int getYear() {
             return year;
         }
@@ -190,14 +205,18 @@ public class MovieOverviewResponse {
         public void setEndYear(Integer endYear) {
             this.endYear = endYear;
         }
+
     }
 
+    // Clase Anidada ReleaseDate
     public static class ReleaseDate {
+
+        // Atributos
         private int month;
         private int day;
         private int year;
 
-        // Getters and setters
+        // Getters y Setters
         public int getMonth() {
             return month;
         }
@@ -221,12 +240,16 @@ public class MovieOverviewResponse {
         public void setYear(int year) {
             this.year = year;
         }
+
     }
 
+    // Clase Anidada TitleType
     public static class TitleType {
+
+        // Atributos
         private String text;
 
-        // Getters and setters
+        // Getters y Setters
         public String getText() {
             return text;
         }
@@ -234,12 +257,16 @@ public class MovieOverviewResponse {
         public void setText(String text) {
             this.text = text;
         }
+
     }
 
+    // Clase Anidada PrimaryImage
     public static class PrimaryImage {
+
+        // Atributos
         private String url;
 
-        // Getters and setters
+        // Getters y Setters
         public String getUrl() {
             return url;
         }
@@ -247,13 +274,17 @@ public class MovieOverviewResponse {
         public void setUrl(String url) {
             this.url = url;
         }
+
     }
 
+    // Clase Anidada RatingsSummary
     public static class RatingsSummary {
+
+        // Atributos
         private double aggregateRating;
         private int voteCount;
 
-        // Getters and setters
+        // Getters y Setters
         public double getAggregateRating() {
             return aggregateRating;
         }
@@ -269,12 +300,16 @@ public class MovieOverviewResponse {
         public void setVoteCount(int voteCount) {
             this.voteCount = voteCount;
         }
+
     }
 
+    // Clase Anidada EngagementStatistics
     public static class EngagementStatistics {
+
+        // Atributos
         private WatchlistStatistics watchlistStatistics;
 
-        // Getters and setters
+        // Getters y Setters
         public WatchlistStatistics getWatchlistStatistics() {
             return watchlistStatistics;
         }
@@ -283,10 +318,13 @@ public class MovieOverviewResponse {
             this.watchlistStatistics = watchlistStatistics;
         }
 
+        // Clase Anidada WatchlistStatistics
         public static class WatchlistStatistics {
+
+            // Atributos
             private DisplayableCount displayableCount;
 
-            // Getters and setters
+            // Getters y Setters
             public DisplayableCount getDisplayableCount() {
                 return displayableCount;
             }
@@ -295,10 +333,13 @@ public class MovieOverviewResponse {
                 this.displayableCount = displayableCount;
             }
 
+            // Clase Anidada DisplayableCount
             public static class DisplayableCount {
+
+                // Atributos
                 private String text;
 
-                // Getters and setters
+                // Getters y Setters
                 public String getText() {
                     return text;
                 }
@@ -306,14 +347,19 @@ public class MovieOverviewResponse {
                 public void setText(String text) {
                     this.text = text;
                 }
+
             }
         }
+
     }
 
+    // Clase anidada Plot
     public static class Plot {
+
+        // Atributos
         private PlotText plotText;
 
-        // Getters and setters
+        // Getters y Setters
         public PlotText getPlotText() {
             return plotText;
         }
@@ -322,10 +368,13 @@ public class MovieOverviewResponse {
             this.plotText = plotText;
         }
 
+        // Clase anidada PlotText
         public static class PlotText {
+
+            // Atributos
             private String plainText;
 
-            // Getters and setters
+            // Getters y Setters
             public String getPlainText() {
                 return plainText;
             }
@@ -333,13 +382,18 @@ public class MovieOverviewResponse {
             public void setPlainText(String plainText) {
                 this.plainText = plainText;
             }
+
         }
+
     }
 
+    // Clase Anidada Certificate
     public static class Certificate {
+
+        // Atributos
         private String rating;
 
-        // Getters and setters
+        // Getters y Setters
         public String getRating() {
             return rating;
         }
@@ -347,12 +401,16 @@ public class MovieOverviewResponse {
         public void setRating(String rating) {
             this.rating = rating;
         }
+
     }
 
+    // Clase Anidada RunTime
     public static class Runtime {
+
+        // Atributos
         private int seconds;
 
-        // Getters and setters
+        // Getters y Setters
         public int getSeconds() {
             return seconds;
         }
@@ -360,5 +418,6 @@ public class MovieOverviewResponse {
         public void setSeconds(int seconds) {
             this.seconds = seconds;
         }
+
     }
 }

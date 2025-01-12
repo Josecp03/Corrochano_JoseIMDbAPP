@@ -23,12 +23,14 @@ import edu.pmdm.corrochano_josimdbapp.models.Movie;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder> {
 
+    // Atributos
     private final Context context;
     private final List<Movie> movieList;
     private final String idUsuario;
     private final FavoriteDatabaseHelper databaseHelper;
     private final boolean favoritos;
 
+    // Constructor
     public MovieAdapter(Context context, List<Movie> movieList, String idUsuario, FavoriteDatabaseHelper databaseHelper, boolean favoritos) {
         this.context = context;
         this.movieList = movieList;
@@ -46,25 +48,47 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     @Override
     public void onBindViewHolder(@NonNull MovieViewHolder holder, int position) {
+
         Movie movie = movieList.get(position);
 
-        Glide.with(context).load(movie.getPosterPath()).into(holder.posterImageView);
+        // Usar Glide para cargar la imagen con una predeterminada en caso de error
+        Glide.with(context)
+                .load(movie.getPosterPath()) // Cargar la portada de la película
+                .error(R.mipmap.placeholderportada) // Imagen predeterminada en caso de error
+                .into(holder.posterImageView);
 
-        // Listener para cuando hago click sobre una película
-        holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(context, MovieDetailsActivity.class);
-            intent.putExtra("pelicula", movie);
-            context.startActivity(intent);
+        // Listener para cuando hago Click sobre una película
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // Crear el intent que nos dirige a la actividad donde se muetsran los detalles
+                Intent intent = new Intent(context, MovieDetailsActivity.class);
+
+                // Pasarle el objeto película con todos sus detalles
+                intent.putExtra("pelicula", movie);
+
+                // Lanzar el intent
+                context.startActivity(intent);
+
+            }
         });
 
         // Listener para cuando hago longClick sobre una película
-        holder.itemView.setOnLongClickListener(v -> {
-            if (!favoritos) {
-                agregarFavorito(movie, holder.getAdapterPosition());
-            } else {
-                eliminarFavorito(movie, holder.getAdapterPosition());
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                // Comprobar la variable booleana para saber si la película sobre la que estoy pinchando está ya en favoritos o no
+                if (!favoritos) {
+                    agregarFavorito(movie, holder.getAdapterPosition());
+                } else {
+                    eliminarFavorito(movie, holder.getAdapterPosition());
+                }
+
+                return true;
+
             }
-            return true;
         });
 
     }
@@ -75,18 +99,25 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     }
 
     public static class MovieViewHolder extends RecyclerView.ViewHolder {
+
         ImageView posterImageView;
 
         public MovieViewHolder(@NonNull View itemView) {
             super(itemView);
+
+            // Inicialización de la ImageView utilizando findViewById para enlazarla con el ID definido en el layout XML
             posterImageView = itemView.findViewById(R.id.ImageViewPelicula);
+
         }
     }
 
+    // Método para agregar a favoritos una película
     private void agregarFavorito(Movie movie, int position) {
 
+        // Obtener una instancia de la base de datos en modo escritura
         SQLiteDatabase dbWrite = databaseHelper.getWritableDatabase();
 
+        // Insertar la película en la tabla de favoritos mediante el método insertarFavorito del DatabaseHelper
         long result = databaseHelper.insertarFavorito(
                 dbWrite,
                 idUsuario,
@@ -95,8 +126,10 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
                 movie.getPosterPath()
         );
 
+        // Cerrar la conexión a la base de datos
         dbWrite.close();
 
+        // Comprobar si se ha realizado la operación para informar al usuario
         if (result != -1) {
             Toast.makeText(context, "Agregada a favoritos: " + movie.getTitle(), Toast.LENGTH_SHORT).show();
         } else {
@@ -104,15 +137,23 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         }
     }
 
+    // Método para eliminar de favoritos una película
     private void eliminarFavorito(Movie movie, int position) {
+
+        // Obtener una instancia de la base de datos en modo escritura
         SQLiteDatabase dbWrite = databaseHelper.getWritableDatabase();
+
+        // Eliminar la película de la tabla de favoritos
         int rowsDeleted = dbWrite.delete(
                 FavoriteDatabaseHelper.TABLE_FAVORITOS,
                 "idUsuario=? AND idPelicula=?",
                 new String[]{idUsuario, movie.getId()}
         );
+
+        // Cerrar la conexión a la base de datos
         dbWrite.close();
 
+        // Verificar si se ha realizado la operación para informar al usuario y realizar las operaciones necesarias
         if (rowsDeleted > 0) {
             Toast.makeText(context, movie.getTitle() + " eliminado de favoritos", Toast.LENGTH_SHORT).show();
             movieList.remove(position);
@@ -120,5 +161,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         } else {
             Toast.makeText(context, "Error al eliminar de favoritos.", Toast.LENGTH_SHORT).show();
         }
+
     }
 }

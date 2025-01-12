@@ -7,19 +7,19 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="edu.pmdm.corrochano_josimdbapp.ui.home.HomeFragment"
+        android:name="edu.pmdm.corrochano_josimdbapp.ui.top10.Top10Fragment"
         android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_top10" />
 
     <fragment
         android:id="@+id/nav_gallery"
         android:name="edu.pmdm.corrochano_josimdbapp.ui.favorites.FavoritesFragment"
         android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_gallery" />
+        tools:layout="@layout/fragment_favorites" />
 
     <fragment
         android:id="@+id/nav_slideshow"
-        android:name="edu.pmdm.corrochano_josimdbapp.ui.slideshow.SlideshowFragment"
+        android:name="edu.pmdm.corrochano_josimdbapp.ui.search.SearchFragment"
         android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
+        tools:layout="@layout/fragment_search" />
 </navigation>

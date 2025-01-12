@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -27,6 +26,7 @@ import edu.pmdm.corrochano_josimdbapp.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
 
+    // Atributos
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
     private GoogleSignInClient googleSignInClient;
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
-        // Inicializar GoogleSignInClient
+        // Inicializar GoogleSignInClient con las opciones configuradas
         GoogleSignInOptions options = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.client_id))
                 .requestEmail()
@@ -79,20 +79,34 @@ public class MainActivity extends AppCompatActivity {
 
         // Configurar el botón de Log Out
         Button logoutButton = headerView.findViewById(R.id.button);
+
+        // Listener para cuando se pulsa el botón de Logout
         logoutButton.setOnClickListener(v -> {
+
+            // Cierra la sesión en Firebase
             FirebaseAuth.getInstance().signOut();
+
+            // Cierra la sesión en Google Sign-In
             googleSignInClient.signOut().addOnCompleteListener(this, task -> {
+
+                // Crear el intent para redirigir al usuario a la pantalla principal
                 Intent intent = new Intent(MainActivity.this, LogInActivity.class);
+
+                // Limpia el historial de actividades
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                // Lanzar el intent
                 startActivity(intent);
+
+                // Finalizar la actividad actual
                 finish();
+                
             });
         });
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }

@@ -9,7 +9,7 @@ import androidx.annotation.Nullable;
 
 public class FavoriteDatabaseHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 5; // Actualizado a la versión 5
+    private static final int DATABASE_VERSION = 5;
     private static final String DATABASE_NOMBRE = "peliculas.db";
     public static final String TABLE_FAVORITOS = "t_favoritos";
 
@@ -35,7 +35,6 @@ public class FavoriteDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    // Método actualizado para insertar favoritos con las nuevas columnas
     public long insertarFavorito(SQLiteDatabase db,
                                  String idUsuario,
                                  String idPelicula,
