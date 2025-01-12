@@ -200,9 +200,6 @@ public class FavoritesFragment extends Fragment {
             AlertDialog dialogoShare = crearDiaogoInstrucciones(cadenaJSON);
             dialogoShare.show();
 
-            // Comentario de prueba
-
-
         }
 
     }
