@@ -36,25 +36,27 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MovieListActivity extends AppCompatActivity {
 
-    // Atributos
     private RecyclerView recyclerView;
     private List<Movie> movieList = new ArrayList<>();
     private MovieAdapter adapter;
     private FavoriteDatabaseHelper databaseHelper;
-    private static final String TMDB_API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmMDE2ZGRjOGRhYWZmYzUyYmM1MmUxN2I1MTQ2ZTk3MSIsIm5iZiI6MTczNjUzOTU1MC43NjksInN1YiI6IjY3ODE3ZDllYzVkMmU5NmUyNjdiNGMwZiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.cP-LiqfqCtg1E7xRX6nPOT3cdttykNkk95N3dvGxkbA"; // Reemplaza con tu clave API segura
+
+    // Clave API de TMDb
+    private static final String TMDB_API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmMDE2ZGRjOGRhYWZmYzUyYmM1MmUxN2I1MTQ2ZTk3MSIsIm5iZiI6MTczNjUzOTU1MC43NjksInN1YiI6IjY3ODE3ZDllYzVkMmU5NmUyNjdiNGMwZiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.cP-LiqfqCtg1E7xRX6nPOT3cdttykNkk95N3dvGxkbA"; // Reemplaza con tu nueva clave API
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_movie_list);
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        // Asignar el valor del XML del recyclerView
+        // Referenciar el RecyclerView por su ID
         recyclerView = findViewById(R.id.recyclerView);
 
         // Inicializar la base de datos
@@ -65,26 +67,43 @@ public class MovieListActivity extends AppCompatActivity {
 
         // Obtener el UID del usuario actual
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        String idUsuario = currentUser.getUid();
+        String idUsuario = (currentUser != null) ? currentUser.getUid() : null;
 
-        // Crear el adaptador para mostrar la lista de películas
+        if (idUsuario == null) {
+            Toast.makeText(this, "Usuario no autenticado.", Toast.LENGTH_SHORT).show();
+            // Opcional: Redirigir al usuario a la pantalla de login
+            finish();
+            return;
+        }
+
         adapter = new MovieAdapter(this, movieList, idUsuario, databaseHelper, false);
         recyclerView.setAdapter(adapter);
 
         // Obtener los extras del Intent
         Intent intent = getIntent();
-        String yearStr = intent.getStringExtra("year");
-        int genreId = intent.getIntExtra("genreId", -1);
-        int year = Integer.parseInt(yearStr);
+        if (intent != null) {
+            String yearStr = intent.getStringExtra("year");
+            int genreId = intent.getIntExtra("genreId", -1);
 
-        // Llamar al método para buscar las películas según los atributos recibidos
-        buscarPeliculas(year, genreId);
-
+            // Validar los datos recibidos
+            if (yearStr != null && genreId != -1) {
+                try {
+                    int year = Integer.parseInt(yearStr);
+                    buscarPeliculas(year, genreId);
+                } catch (NumberFormatException e) {
+                    Toast.makeText(this, "Año de publicación inválido.", Toast.LENGTH_SHORT).show();
+                    Log.e("MovieListActivity", "Error al convertir el año: " + e.getMessage());
+                }
+            } else {
+                Toast.makeText(this, "Datos incompletos recibidos.", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Toast.makeText(this, "No se recibieron datos.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void buscarPeliculas(int year, int genreId) {
-
-        // Configuración de la API
+        // Configurar Retrofit con Interceptor para añadir headers
         OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(chain -> {
                     okhttp3.Request request = chain.request().newBuilder()
@@ -95,40 +114,28 @@ public class MovieListActivity extends AppCompatActivity {
                 })
                 .build();
 
-        // Inicialización de Retrofit
+        // Inicializar Retrofit
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.themoviedb.org/3/")
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        // Declarar e inicializar la interfaz IMDBApiService para realizar las solicitudes a la API
         TMDbApiService tmdbApiService = retrofit.create(TMDbApiService.class);
 
-        // Realizar una llamada a la API para buscar películas según año, género, idioma, orden y página.
+        // Realizar la llamada a la API
         Call<MovieSearchResponse> call = tmdbApiService.searchMovies(year, genreId, "es-ES", "popularity.desc", 1);
-
-        // Maneja la respuesta de la llamada de forma asíncrona utilizando enqueue
         call.enqueue(new Callback<MovieSearchResponse>() {
             @Override
             public void onResponse(Call<MovieSearchResponse> call, Response<MovieSearchResponse> response) {
-
-                // Verifica si la respuesta fue exitosa y contiene un cuerpo válido
                 if (response.isSuccessful() && response.body() != null) {
+                    // Log de la respuesta para debugging
+                    Log.d("MovieListActivity", "Respuesta de la API: " + new com.google.gson.Gson().toJson(response.body()));
 
-                    // Obtiene la lista de resultados de películas desde la respuesta
                     List<TMDBMovie> results = response.body().getResults();
-
-                    // Comprobar si hay resultados y no está vacío
                     if (results != null && !results.isEmpty()) {
-
-                        // Limpia la lista actual de películas antes de agregar nuevas
                         movieList.clear();
-
-                        // Recorre las películas obtenidas
                         for (TMDBMovie tmdbMovie : results) {
-
-                            // Crea una clase Movie y asigna los parámetros
                             Movie movie = new Movie();
                             movie.setId(String.valueOf(tmdbMovie.getId()));
                             movie.setTitle(tmdbMovie.getTitle());
@@ -136,29 +143,37 @@ public class MovieListActivity extends AppCompatActivity {
                             movie.setReleaseDate(tmdbMovie.getRelease_date());
                             movie.setDescripcion(tmdbMovie.getOverview());
                             movie.setRating(String.valueOf(tmdbMovie.getVote_average()));
-                            movie.setPosterPath("https://image.tmdb.org/t/p/w500" + tmdbMovie.getPoster_path());
 
-                            // Llamada al método para obtener el ID de IMDB de la película
+                            // Construir la URL completa de la imagen
+                            String posterPath = tmdbMovie.getPoster_path();
+                            if (posterPath != null && !posterPath.isEmpty()) {
+                                String posterUrl = "https://image.tmdb.org/t/p/w500" + posterPath;
+                                movie.setPosterPath(posterUrl);
+                            } else {
+                                // URL por defecto si no hay poster
+                                movie.setPosterPath("https://via.placeholder.com/500x750?text=No+Image");
+                            }
+
+                            // Llamada para obtener el ID de IMDB
                             obtenerImdbId(String.valueOf(tmdbMovie.getId()), movie);
 
                             // Agregar la película a la lista
                             movieList.add(movie);
-
                         }
-
-                        // Notificar al adaptador que los datos han cambiado para actualizar la vista
                         adapter.notifyDataSetChanged();
                     } else {
                         Toast.makeText(MovieListActivity.this, "No se encontraron películas para los parámetros especificados.", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Toast.makeText(MovieListActivity.this, "Error al cargar películas: " + response.message(), Toast.LENGTH_SHORT).show();
+                    Log.e("MovieListActivity", "Respuesta no exitosa: " + response.code());
                 }
             }
 
             @Override
             public void onFailure(Call<MovieSearchResponse> call, Throwable t) {
-                Toast.makeText(MovieListActivity.this, "Error en la llamada API: " + t.getMessage(), Toast.LENGTH_SHORT).show(); // Comentario de prieba
+                Toast.makeText(MovieListActivity.this, "Error en la llamada API: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("MovieListActivity", "Error en la llamada API: " + t.getMessage());
             }
         });
     }
@@ -166,55 +181,41 @@ public class MovieListActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        // Aquí puedes limpiar recursos si es necesario
     }
 
     private void obtenerImdbId(String tmdbId, Movie movie) {
-
-        // Configura Retrofit para realizar llamadas a la API de TMDb sin headers adicionales
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.themoviedb.org/3/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        // Crea una instancia del servicio API definido en TMDbApiService
         TMDbApiService tmdbApiService = retrofit.create(TMDbApiService.class);
 
-        // Realiza una llamada a la API para obtener los IDs externos
         Call<JsonObject> call = tmdbApiService.getExternalIds(tmdbId, "Bearer " + TMDB_API_KEY);
-
-        // Maneja la respuesta de la llamada de forma asíncrona utilizando enqueue
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-
-                // Comprobar si la respuesta fue exitosa y el cuerpo de la respuesta no es nulo
                 if (response.isSuccessful() && response.body() != null) {
-
-                    // Intenta obtener el elemento "imdb_id" del JSON de la respuesta
                     JsonElement imdbIdElement = response.body().get("imdb_id");
-
-                    // Comprobar si "imdb_id" no es nulo ni un valor JSON nulo
                     if (imdbIdElement != null && !imdbIdElement.isJsonNull()) {
-
-                        // Asigna el ID de IMDB al objeto Movie
                         String imdbId = imdbIdElement.getAsString();
-                        movie.setId(imdbId);
-
+                        movie.setId(imdbId); // Guarda el ID de IMDB en el objeto Movie
                     } else {
+                        Log.e("MovieListActivity", "El campo 'imdb_id' es null o no existe");
                         movie.setId("ID no disponible");
                     }
                 } else {
-                    movie.setId("ID no disponible");
+                    Log.e("MovieListActivity", "No se pudo obtener el ID de IMDB: " + response.code());
                 }
-
             }
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
-                movie.setId("ID no disponible");
+                Log.e("MovieListActivity", "Error en la llamada a TMDB: " + t.getMessage());
             }
-
         });
     }
+
 
 }
