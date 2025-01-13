@@ -196,8 +196,8 @@ public class FavoritesFragment extends Fragment {
             Gson gson = new Gson();
             String cadenaJSON = gson.toJson(pelisFavoritas);
 
-            // Crear el doálogo llamando al método pasandole la cadena como parámetro
-            AlertDialog dialogoShare = crearDiaogoInstrucciones(cadenaJSON);
+            // Crear el diálogo llamando al método pasandole la cadena como parámetro
+            AlertDialog dialogoShare = crearDiaogoBluetooth(cadenaJSON);
             dialogoShare.show();
 
         }
@@ -205,7 +205,7 @@ public class FavoritesFragment extends Fragment {
     }
 
     // Método para crear e inflar el diálogo en el fragmento
-    private AlertDialog crearDiaogoInstrucciones(String listaPeliculasJSON) {
+    private AlertDialog crearDiaogoBluetooth(String listaPeliculasJSON) {
 
         // Inicializar Variables
         AlertDialog dialogo = null;

@@ -134,7 +134,7 @@ public class Top10Fragment extends Fragment {
             // Muestra un mensaje de error si ocurre un fallo en la conexión o en la llamada a la API
             @Override
             public void onFailure(Call<PopularMoviesResponse> call, Throwable t) {
-                Log.e("HomeFragment", "Error en la llamada API: " + t.getMessage());
+                Toast.makeText(getContext(), "Error en la llamda a la API", Toast.LENGTH_SHORT).show();
             }
         });
 
